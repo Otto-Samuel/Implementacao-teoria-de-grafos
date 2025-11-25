@@ -1,0 +1,5 @@
+// Árvore Rubro-Negra
+digraph {
+	rankdir=TB size="20,20"
+	node [fontname=Arial fontsize=20 penwidth=3 shape=circle style=filled]
+}

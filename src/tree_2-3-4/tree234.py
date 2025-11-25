@@ -1,0 +1,134 @@
+# tree_234_graphviz_PERFEITA.py
+import os
+from graphviz import Digraph
+
+# FORÇA O CAMINHO DO GRAPHVIZ (mesmo truque da Rubro-Negra)
+os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
+
+class Node234:
+    def __init__(self):
+        self.keys = []          # 1 a 3 chaves
+        self.children = []      # 0 ou 2 a 4 filhos
+        self.parent = None
+
+    def is_leaf(self):
+        return len(self.children) == 0
+
+    def is_full(self):
+        return len(self.keys) == 3
+
+class Tree234:
+    def __init__(self):
+        self.root = Node234()
+
+    def search(self, key):
+        node = self.root
+        while node:
+            if key in node.keys:
+                return True
+            if node.is_leaf():
+                return False
+            i = 0
+            while i < len(node.keys) and key > node.keys[i]:
+                i += 1
+            node = node.children[i]
+        return False
+
+    def split(self, node):
+        parent = node.parent
+        mid = node.keys[1]  # mediana (índice 1)
+
+        # Nó esquerdo (fica com keys[0])
+        left = Node234()
+        left.keys = [node.keys[0]]
+        left.children = node.children[:2]
+        for child in left.children:
+            if child: child.parent = left
+
+        # Nó direito (fica com keys[2])
+        right = Node234()
+        right.keys = [node.keys[2]]
+        right.children = node.children[2:]
+        for child in right.children:
+            if child: child.parent = right
+
+        if not parent:  # split da raiz
+            new_root = Node234()
+            new_root.keys = [mid]
+            new_root.children = [left, right]
+            left.parent = right.parent = new_root
+            self.root = new_root
+        else:
+            # Insere mediana no pai
+            i = parent.children.index(node)
+            parent.keys.insert(i, mid)
+            parent.children[i:i+1] = [left, right]
+            left.parent = right.parent = parent
+
+            if len(parent.keys) == 3:
+                self.split(parent)
+
+    def insert(self, key):
+        if self.search(key):
+            return  # ignora duplicados
+
+        node = self.root
+        while not node.is_leaf():
+            i = 0
+            while i < len(node.keys) and key > node.keys[i]:
+                i += 1
+            node = node.children[i]
+
+        # Insere na folha
+        i = 0
+        while i < len(node.keys) and key > node.keys[i]:
+            i += 1
+        node.keys.insert(i, key)
+
+        if node.is_full():
+            self.split(node)
+
+# ======================== PLOT 2-3-4 COM GRAPHVIZ ========================
+def plot_tree234(tree):
+    dot = Digraph(comment='Árvore 2-3-4')
+    dot.attr(rankdir='TB', size='35,45', dpi='300')
+    dot.attr('node', shape='box', style='filled,rounded', fontname='Arial Bold',
+             fontsize='26', penwidth='4')
+
+    def add_node(node):
+        if not node.keys:
+            return
+
+        # Junta todas as chaves com separador bonito
+        label = "  │  ".join(map(str, node.keys))
+        fillcolor = "#2e7d32"  # verde escuro lindo
+        dot.node(str(id(node)), label, fillcolor=fillcolor, fontcolor="white")
+
+        for child in node.children:
+            if child and child.keys:
+                dot.edge(str(id(node)), str(id(child)), penwidth='3', color='#1b5e20')
+                add_node(child)
+
+    add_node(tree.root)
+    nome = 'arvore_234_PERFEITA'
+    dot.render(nome, format='png', cleanup=True)
+    print(f"\nÁrvore 2-3-4 gerada com sucesso!")
+    print(f"Arquivo salvo como: {nome}.png")
+    os.startfile(f"{nome}.png")  # abre automaticamente
+
+# ============================= TESTE =============================
+print("=== ÁRVORE 2-3-4 ===\nInserindo 30 valores...\n")
+
+t = Tree234()
+valores = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85,
+           15, 28, 32, 38, 42, 48, 52, 58, 62, 90, 5, 95, 12, 18, 22]
+
+for v in valores:
+    t.insert(v)
+    print(f"Inserido: {v}")
+
+print(f"\nBusca 42: {t.search(42)}")
+print(f"Busca 999: {t.search(999)}")
+
+# GERA A IMAGEM PERFEITA
+plot_tree234(t)
