@@ -127,4 +127,50 @@ class RedBlackTree:
 
         self.insert_fix(node)
 
+    def delete_fix(self, x):
+        while x != self.root and x.color == "black":
+            if x == x.parent.left:
+                s = x.parent.right
+                if s.color == "red":
+                    s.color = "black"
+                    x.parent.color = "red"
+                    self.left_rotate(x.parent)
+                    s = x.parent.right
+                if s.left.color == "black" and s.right.color == "black":
+                    s.color = "red"
+                    x = x.parent
+                else:
+                    if s.right.color == "black":
+                        s.left.color = "black"
+                        s.color = "red"
+                        self.right_rotate(s)
+                        s = x.parent.right
+                    s.color = x.parent.color
+                    x.parent.color = "black"
+                    s.right.color = "black"
+                    self.left_rotate(x.parent)
+                    x = self.root
+            else:
+                s = x.parent.left
+                if s.color == "red":
+                    s.color = "black"
+                    x.parent.color = "red"
+                    self.right_rotate(x.parent)
+                    s = x.parent.left
+                if s.right.color == "black" and s.left.color == "black":
+                    s.color = "red"
+                    x = x.parent
+                else:
+                    if s.left.color == "black":
+                        s.right.color = "black"
+                        s.color = "red"
+                        self.left_rotate(s)
+                        s = x.parent.left
+                    s.color = x.parent.color
+                    x.parent.color = "black"
+                    s.left.color = "black"
+                    self.right_rotate(x.parent)
+                    x = self.root
+        x.color = "black"
+
     
