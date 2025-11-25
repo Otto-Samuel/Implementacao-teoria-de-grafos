@@ -59,4 +59,72 @@ class RedBlackTree:
         x.right = y
         y.parent = x
 
+    def insert_fix(self, k):
+        while k.parent.color == "red":
+            if k.parent == k.parent.parent.right:
+                u = k.parent.parent.left  # tio
+                if u.color == "red":
+                    u.color = "black"
+                    k.parent.color = "black"
+                    k.parent.parent.color = "red"
+                    k = k.parent.parent
+                else:
+                    if k == k.parent.left:
+                        k = k.parent
+                        self.right_rotate(k)
+                    k.parent.color = "black"
+                    k.parent.parent.color = "red"
+                    self.left_rotate(k.parent.parent)
+            else:
+                u = k.parent.parent.right  # tio
+                if u.color == "red":
+                    u.color = "black"
+                    k.parent.color = "black"
+                    k.parent.parent.color = "red"
+                    k = k.parent.parent
+                else:
+                    if k == k.parent.right:
+                        k = k.parent
+                        self.left_rotate(k)
+                    k.parent.color = "black"
+                    k.parent.parent.color = "red"
+                    self.right_rotate(k.parent.parent)
+            if k == self.root:
+                break
+        self.root.color = "black"
+
+    def insert(self, key):
+        node = Node(key)
+        node.left = self.NIL
+        node.right = self.NIL
+
+        y = None
+        x = self.root
+
+        while x != self.NIL:
+            y = x
+            if node.key < x.key:
+                x = x.left
+            elif node.key > x.key:
+                x = x.right
+            else:
+                return  # Ignora duplicado
+
+        node.parent = y
+        if y is None:
+            self.root = node
+        elif node.key < y.key:
+            y.left = node
+        else:
+            y.right = node
+
+        if node.parent is None:
+            node.color = "black"
+            return
+
+        if node.parent.parent is None:
+            return
+
+        self.insert_fix(node)
+
     
