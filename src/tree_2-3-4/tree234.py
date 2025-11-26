@@ -36,23 +36,21 @@ class Tree234:
 
     def split(self, node):
         parent = node.parent
-        mid = node.keys[1]  # mediana (índice 1)
+        mid = node.keys[1]  
 
-        # Nó esquerdo (fica com keys[0])
         left = Node234()
         left.keys = [node.keys[0]]
         left.children = node.children[:2]
         for child in left.children:
             if child: child.parent = left
 
-        # Nó direito (fica com keys[2])
         right = Node234()
         right.keys = [node.keys[2]]
         right.children = node.children[2:]
         for child in right.children:
             if child: child.parent = right
 
-        if not parent:  # split da raiz
+        if not parent:  
             new_root = Node234()
             new_root.keys = [mid]
             new_root.children = [left, right]
@@ -88,7 +86,7 @@ class Tree234:
         if node.is_full():
             self.split(node)
 
-# ======================== PLOT 2-3-4 COM GRAPHVIZ ========================
+#! ======================== PLOT 2-3-4 COM GRAPHVIZ ========================
 def plot_tree234(tree):
     dot = Digraph(comment='Árvore 2-3-4')
     dot.attr(rankdir='TB', size='35,45', dpi='300')

@@ -1,14 +1,10 @@
-# rb_negra_graphviz_FORÇADO.py
-# Funciona mesmo se o PATH estiver zuado
-
 import os
 from graphviz import Digraph
 
-# ==================== FORÇA O CAMINHO DO GRAPHVIZ (SOLUÇÃO MÁGICA) ====================
-# Mude só se o seu Graphviz foi instalado em outro lugar
-GRAPHVIZ_BIN_PATH = r"C:\Program Files\Graphviz\bin"   # 99% dos casos é aqui
+
+GRAPHVIZ_BIN_PATH = r"C:\Program Files\Graphviz\bin"   
 os.environ["PATH"] += os.pathsep + GRAPHVIZ_BIN_PATH
-# ==================================================================================
+
 
 class Node:
     def __init__(self, key):
