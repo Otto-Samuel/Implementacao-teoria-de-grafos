@@ -1,8 +1,6 @@
-# tree_234_graphviz_PERFEITA.py
 import os
 from graphviz import Digraph
 
-# FORÇA O CAMINHO DO GRAPHVIZ (mesmo truque da Rubro-Negra)
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 
 class Node234:
@@ -86,7 +84,7 @@ class Tree234:
         if node.is_full():
             self.split(node)
 
-#! ======================== PLOT 2-3-4 COM GRAPHVIZ ========================
+#TODO ======================== PLOT 2-3-4 COM GRAPHVIZ ========================
 def plot_tree234(tree):
     dot = Digraph(comment='Árvore 2-3-4')
     dot.attr(rankdir='TB', size='35,45', dpi='300')
@@ -114,8 +112,8 @@ def plot_tree234(tree):
     print(f"Arquivo salvo como: {nome}.png")
     os.startfile(f"{nome}.png")  # abre automaticamente
 
-# ============================= TESTE =============================
-print("=== ÁRVORE 2-3-4 ===\nInserindo 30 valores...\n")
+#? ============================= TESTE =============================
+print("=== ÁRVORE 2-3-4 ===\nInserindo 30 valores diferentes...\n")
 
 t = Tree234()
 valores = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85,

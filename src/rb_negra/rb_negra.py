@@ -1,10 +1,8 @@
 import os
 from graphviz import Digraph
 
-
 GRAPHVIZ_BIN_PATH = r"C:\Program Files\Graphviz\bin"   
 os.environ["PATH"] += os.pathsep + GRAPHVIZ_BIN_PATH
-
 
 class Node:
     def __init__(self, key):
@@ -123,7 +121,7 @@ class RedBlackTree:
             node = node.left if key < node.key else node.right
         return False
 
-# ======================== PLOT COM GRAPHVIZ (FORÇADO) ========================
+#TODO ======================== PLOT COM GRAPHVIZ  ========================
 def plot_rubro_negra(tree):
     dot = Digraph(comment='Árvore Rubro-Negra')
     dot.attr(rankdir='TB', size='30,40', dpi='300', bgcolor='white')
