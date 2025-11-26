@@ -1,4 +1,4 @@
-![test](https://capsule-render.vercel.app/api?type=rounded&height=200&color=373C3E&text=rubro%20negra%20e%202-3-4&fontColor=FFFFFF)
+![test](https://capsule-render.vercel.app/api?type=rounded&height=100&color=373C3E&text=rubro%20negra%20e%202-3-4&fontColor=FFFFFF&fontSize=25)
 
 ### ✍️ **Conceitos**
 
@@ -17,4 +17,4 @@
 </table>
 <br>
 
-![test](https://capsule-render.vercel.app/api?type=rounded&height=100&color=373C3E&fontColor=FFFFFF)
+![test](https://capsule-render.vercel.app/api?type=rounded&height=50&color=373C3E&fontColor=FFFFFF)
