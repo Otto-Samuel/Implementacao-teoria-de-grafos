@@ -1,8 +1,14 @@
+# rb_negra.py
 import os
+import copy
 from graphviz import Digraph
+import imageio
+from datetime import datetime
+from typing import Optional
 
-GRAPHVIZ_BIN_PATH = r"C:\Program Files\Graphviz\bin"   
-os.environ["PATH"] += os.pathsep + GRAPHVIZ_BIN_PATH
+# Ajuste se precisar do caminho do Graphviz no Windows:
+# GRAPHVIZ_BIN_PATH = r"C:\Program Files\Graphviz\bin"
+# os.environ["PATH"] += os.pathsep + GRAPHVIZ_BIN_PATH
 
 class Node:
     def __init__(self, key):
@@ -12,20 +18,136 @@ class Node:
         self.parent = None
         self.color = "red"
 
+    def __repr__(self):
+        return f"Node({self.key},{self.color})"
+
 class RedBlackTree:
     def __init__(self):
+        # sentinel NIL único da árvore "viva"
         self.NIL = Node(None)
         self.NIL.color = "black"
         self.NIL.left = self.NIL.right = self.NIL
         self.root = self.NIL
 
+        # registro de snapshots — cada entry tem: idx, ts, descricao, root_copy
+        self._steps = []
+        self._step_counter = 0
+        # snapshot do estado inicial (árvore vazia)
+        self._snapshot("inicial (vazia)")
+
+    # ---------------- Snapshot / copia ----------------
+    def _snapshot(self, descricao: str) -> None:
+        """Guarda descrição da etapa com uma cópia profunda da árvore atual."""
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        # copia profunda da árvore, criando novos nós e novo sentinel
+        copia_root = self._copy_tree(self.root)
+        entry = {"idx": self._step_counter, "ts": ts, "descricao": descricao, "root": copia_root}
+        self._steps.append(entry)
+        self._step_counter += 1
+
+    def _copy_tree(self, node, parent=None):
+        """Copia recursivamente a árvore atual. Retorna referência à nova raiz.
+           Se node for o sentinel original (self.NIL), cria um novo NIL local.
+        """
+        if node is None:
+            return None
+        # detect sentinel by key None
+        if node == self.NIL or node.key is None:
+            nil_new = Node(None)
+            nil_new.color = "black"
+            nil_new.left = nil_new.right = nil_new
+            return nil_new
+
+        new_node = Node(node.key)
+        new_node.color = node.color
+        new_node.parent = parent
+
+        new_node.left = self._copy_tree(node.left, new_node)
+        new_node.right = self._copy_tree(node.right, new_node)
+
+        return new_node
+
+    # ---------------- Export ----------------
+    def export_steps(self, out_dir: str = "arvore_steps", png: bool = True, gif: bool = False, gif_name: str = "arvore_evolucao.gif", open_after: bool = False) -> None:
+        """Exporta todos os snapshots registrados como PNG e opcionalmente converte para GIF."""
+        os.makedirs(out_dir, exist_ok=True)
+        png_files = []
+        for step in self._steps:
+            idx = step["idx"]
+            desc = step["descricao"]
+            root_copy = step["root"]  # cópia do estado naquele passo
+            filename_base = f"step_{idx:03d}_{self._sanitize(desc)}"
+            png_path = os.path.join(out_dir, filename_base + ".png")
+            self._render_png(root_copy, png_path, title=f"{idx:03d} - {desc}")
+            png_files.append(png_path)
+
+        if gif:
+            frames = []
+            for p in png_files:
+                frames.append(imageio.imread(p))
+            gif_path = os.path.join(out_dir, gif_name)
+            imageio.mimsave(gif_path, frames, duration=0.8)
+            print(f"GIF salvo em: {gif_path}")
+            if open_after:
+                try:
+                    os.startfile(gif_path)
+                except Exception:
+                    pass
+
+        if png:
+            print(f"PNG(s) salvos em: {os.path.abspath(out_dir)}")
+            if open_after and png_files:
+                try:
+                    os.startfile(png_files[-1])
+                except Exception:
+                    pass
+
+    def _sanitize(self, text: str) -> str:
+        ok = "".join(ch if (ch.isalnum() or ch in "-_") else "_" for ch in text)
+        return (ok[:60]).strip("_")
+
+    def _node_id(self, node):
+        # unique id for Graphviz nodes in this snapshot copy
+        return f"n{str(id(node))}"
+
+    def _render_png(self, root_node, out_path: str, title: Optional[str] = None) -> None:
+        """Renderiza uma cópia da árvore (root_node) para PNG. Não mostra NIL placeholders."""
+        dot = Digraph(comment=title or "RubroNegra")
+        dot.attr(rankdir='TB')
+        dot.attr('node', shape='circle', style='filled', fontsize='12', fontname='Arial')
+
+        def add_nodes(n):
+            if n is None:
+                return
+            # assume sentinel tem key is None
+            if getattr(n, "key", None) is None:
+                return
+            fillcolor = "#e74c3c" if n.color == "red" else "#2c3e50"
+            label = str(n.key)
+            dot.node(self._node_id(n), label, fillcolor=fillcolor, fontcolor="white", penwidth='1.2')
+            if getattr(n.left, "key", None) is not None:
+                dot.edge(self._node_id(n), self._node_id(n.left))
+                add_nodes(n.left)
+            if getattr(n.right, "key", None) is not None:
+                dot.edge(self._node_id(n), self._node_id(n.right))
+                add_nodes(n.right)
+
+        if root_node is None or getattr(root_node, "key", None) is None:
+            dot.node("root_nil", "Árvore Vazia", fillcolor="#bdc3c7")
+        else:
+            add_nodes(root_node)
+
+        out_path_base, _ = os.path.splitext(out_path)
+        dot.render(out_path_base, format='png', cleanup=True)
+
+    # ---------------- Rotations (com snapshot) ----------------
     def left_rotate(self, x):
         y = x.right
         x.right = y.left
-        if y.left != self.NIL:
+        if getattr(y.left, "key", None) is not None:
             y.left.parent = x
         y.parent = x.parent
-        if x.parent is None:
+        if x.parent is None or getattr(x.parent, "key", None) is None:
             self.root = y
         elif x == x.parent.left:
             x.parent.left = y
@@ -33,14 +155,15 @@ class RedBlackTree:
             x.parent.right = y
         y.left = x
         x.parent = y
+        self._snapshot(f"left_rotate em {x.key}")
 
     def right_rotate(self, y):
         x = y.left
         y.left = x.right
-        if x.right != self.NIL:
+        if getattr(x.right, "key", None) is not None:
             x.right.parent = y
         x.parent = y.parent
-        if y.parent is None:
+        if y.parent is None or getattr(y.parent, "key", None) is None:
             self.root = x
         elif y == y.parent.right:
             y.parent.right = x
@@ -48,17 +171,21 @@ class RedBlackTree:
             y.parent.left = x
         x.right = y
         y.parent = x
+        self._snapshot(f"right_rotate em {y.key}")
 
+    # ---------------- Insert ----------------
     def insert(self, key):
         if self.search(key):
-            return  # ignora duplicados
+            # evita duplicados
+            self._snapshot(f"insercao_ignorada ({key}) - duplicado")
+            return
 
         node = Node(key)
         node.left = node.right = self.NIL
 
         y = None
         x = self.root
-        while x != self.NIL:
+        while x != self.NIL and getattr(x, "key", None) is not None:
             y = x
             if node.key < x.key:
                 x = x.left
@@ -66,41 +193,54 @@ class RedBlackTree:
                 x = x.right
 
         node.parent = y
-        if y is None:
+        if y is None or getattr(y, "key", None) is None:
             self.root = node
         elif node.key < y.key:
             y.left = node
         else:
             y.right = node
 
-        if node.parent is None:
+        # snapshot logo após posicionar o nó (antes do fix)
+        self._snapshot(f"insercao ({key}) - posicionado")
+
+        if node.parent is None or getattr(node.parent, "key", None) is None:
             node.color = "black"
+            self._snapshot(f"insercao ({key}) - tornou-se raiz (preto)")
             return
-        if node.parent.parent is None:
+        if node.parent.parent is None or getattr(node.parent.parent, "key", None) is None:
+            # pai não tem avô — geralmente sem fix necessário
+            self._snapshot(f"insercao ({key}) - pai sem avô (sem fix)")
             return
 
         self.insert_fix(node)
+        # snapshot final da inserção
+        self._snapshot(f"insercao ({key}) - finalizada")
 
     def insert_fix(self, k):
-        while k.parent and k.parent.color == "red":
+        while k.parent and getattr(k.parent, "color", None) == "red":
             if k.parent == k.parent.parent.right:
                 u = k.parent.parent.left
-                if u.color == "red":
+                if getattr(u, "color", None) == "red":
+                    # recoloração (caso 1)
                     u.color = k.parent.color = "black"
                     k.parent.parent.color = "red"
+                    self._snapshot(f"recoloracao (caso 1) em avô {k.parent.parent.key}")
                     k = k.parent.parent
                 else:
+                    # rotacoes e recoloracoes (caso 2/3)
                     if k == k.parent.left:
                         k = k.parent
                         self.right_rotate(k)
                     k.parent.color = "black"
                     k.parent.parent.color = "red"
                     self.left_rotate(k.parent.parent)
+                    self._snapshot(f"rotacao+recoloracao em avô {k.parent.key if k.parent else 'desconhecido'}")
             else:
                 u = k.parent.parent.right
-                if u.color == "red":
+                if getattr(u, "color", None) == "red":
                     u.color = k.parent.color = "black"
                     k.parent.parent.color = "red"
+                    self._snapshot(f"recoloracao (caso 1) em avô {k.parent.parent.key}")
                     k = k.parent.parent
                 else:
                     if k == k.parent.right:
@@ -109,58 +249,32 @@ class RedBlackTree:
                     k.parent.color = "black"
                     k.parent.parent.color = "red"
                     self.right_rotate(k.parent.parent)
+                    self._snapshot(f"rotacao+recoloracao em avô {k.parent.key if k.parent else 'desconhecido'}")
             if k == self.root:
                 break
-        self.root.color = "black"
+        if self.root != self.NIL:
+            self.root.color = "black"
+        self._snapshot("root colorida de preto (final do insert_fix)")
 
+    # ---------------- Search ----------------
     def search(self, key):
         node = self.root
-        while node != self.NIL:
+        while node != self.NIL and getattr(node, "key", None) is not None:
             if key == node.key:
                 return True
             node = node.left if key < node.key else node.right
         return False
 
-#TODO ======================== PLOT COM GRAPHVIZ  ========================
-def plot_rubro_negra(tree):
-    dot = Digraph(comment='Árvore Rubro-Negra')
-    dot.attr(rankdir='TB', size='30,40', dpi='300', bgcolor='white')
-    dot.attr('node', shape='circle', style='filled', width='1.3', 
-             fontsize='28', fontname='Arial Bold', penwidth='4')
+if __name__ == "__main__":
+    rb = RedBlackTree()
 
-    def add_nodes(node):
-        if node == tree.NIL:
-            return
-        fillcolor = "#e74c3c" if node.color == "red" else "#2c3e50"
-        dot.node(str(id(node)), str(node.key), fillcolor=fillcolor, fontcolor="white")
+    # sequência com 21+ nós que provoca vários casos (ajuste conforme desejar)
+    valores = [30, 15, 40, 10, 20, 35, 50, 5, 12, 18, 25, 32, 37, 45, 55, 3, 8, 11, 14, 17, 19]
 
-        if node.left != tree.NIL:
-            dot.edge(str(id(node)), str(id(node.left)), penwidth='3', color='#2c3e50')
-            add_nodes(node.left)
-        if node.right != tree.NIL:
-            dot.edge(str(id(node)), str(id(node.right)), penwidth='3', color='#2c3e50')
-            add_nodes(node.right)
+    print(f"Inserindo {len(valores)} nós: {valores}")
+    for v in valores:
+        rb.insert(v)
+        print(f"  -> inserido {v}")
 
-    add_nodes(tree.root) # adiciona nós
-    nome_arquivo = 'arvore_rubro_negra_imagem'
-    dot.render(nome_arquivo, format='png', cleanup=True)
-    print(f"\nÁRVORE GERADA COM SUCESSO!")
-    print(f"Arquivo salvo como: {nome_arquivo}.png")
-    os.startfile(f"{nome_arquivo}.png")  # abre automaticamente no Windows
-
-#! ============================= TESTE =============================
-rb = RedBlackTree()
-print("Inserindo 35 valores na Árvore Rubro-Negra...\n")
-
-valores = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85,
-           15, 28, 32, 38, 42, 48, 52, 58, 62, 90, 5, 95, 12, 18, 22, 68, 72, 77, 82, 88]
-
-for v in valores:
-    rb.insert(v)
-    print(f"Inserido: {v}")
-
-print("\nBusca 42:", rb.search(42))
-print("Busca 999:", rb.search(999))
-
-# GERA A IMAGEM DA ARVORE
-plot_rubro_negra(rb)
+    rb.export_steps(out_dir="arvore_steps", png=True, gif=False, gif_name="construcao_rbt.gif", open_after=False)
+    print("Export concluído.")
