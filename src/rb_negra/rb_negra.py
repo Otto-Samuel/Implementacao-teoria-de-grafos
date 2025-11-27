@@ -141,14 +141,14 @@ def plot_rubro_negra(tree):
             dot.edge(str(id(node)), str(id(node.right)), penwidth='3', color='#2c3e50')
             add_nodes(node.right)
 
-    add_nodes(tree.root)
-    nome_arquivo = 'arvore_rubro_negra_PERFEITA'
+    add_nodes(tree.root) # adiciona nós
+    nome_arquivo = 'arvore_rubro_negra_imagem'
     dot.render(nome_arquivo, format='png', cleanup=True)
     print(f"\nÁRVORE GERADA COM SUCESSO!")
     print(f"Arquivo salvo como: {nome_arquivo}.png")
     os.startfile(f"{nome_arquivo}.png")  # abre automaticamente no Windows
 
-# ============================= TESTE =============================
+#! ============================= TESTE =============================
 rb = RedBlackTree()
 print("Inserindo 35 valores na Árvore Rubro-Negra...\n")
 
@@ -162,5 +162,5 @@ for v in valores:
 print("\nBusca 42:", rb.search(42))
 print("Busca 999:", rb.search(999))
 
-# GERA A IMAGEM PERFEITA
+# GERA A IMAGEM DA ARVORE
 plot_rubro_negra(rb)

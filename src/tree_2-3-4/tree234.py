@@ -19,7 +19,7 @@ class Tree234:
     def __init__(self):
         self.root = Node234()
 
-    def search(self, key):
+    def search(self, key): # procurar
         node = self.root
         while node:
             if key in node.keys:
@@ -106,7 +106,7 @@ def plot_tree234(tree):
                 add_node(child)
 
     add_node(tree.root)
-    nome = 'arvore_234_PERFEITA'
+    nome = 'arvore_234_imagem'
     dot.render(nome, format='png', cleanup=True)
     print(f"\nÁrvore 2-3-4 gerada com sucesso!")
     print(f"Arquivo salvo como: {nome}.png")
@@ -116,7 +116,7 @@ def plot_tree234(tree):
 print("=== ÁRVORE 2-3-4 ===\nInserindo 30 valores diferentes...\n")
 
 t = Tree234()
-valores = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85,
+valores = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85,   # valores da arvore 234
            15, 28, 32, 38, 42, 48, 52, 58, 62, 90, 5, 95, 12, 18, 22]
 
 for v in valores:
@@ -126,5 +126,4 @@ for v in valores:
 print(f"\nBusca 42: {t.search(42)}")
 print(f"Busca 999: {t.search(999)}")
 
-# GERA A IMAGEM PERFEITA
 plot_tree234(t)
