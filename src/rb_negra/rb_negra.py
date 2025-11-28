@@ -269,7 +269,7 @@ if __name__ == "__main__":
     rb = RedBlackTree()
 
     # sequência com 21+ nós que provoca vários casos (ajuste conforme desejar)
-    valores = [30, 15, 40, 10, 20, 35, 50, 5, 12, 18, 25, 32, 37, 45, 55, 3, 8, 11, 14, 17, 19]
+    valores = [30, 15, 10, 40, 20, 35, 50, 5, 12, 18, 25, 32, 37, 45, 55, 3, 8, 11, 14, 17, 19]
 
     print(f"Inserindo {len(valores)} nós: {valores}")
     for v in valores:
