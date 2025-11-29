@@ -1,4 +1,3 @@
-# rb_negra.py
 import os
 import copy
 from graphviz import Digraph
@@ -6,7 +5,6 @@ import imageio
 from datetime import datetime
 from typing import Optional
 
-# Ajuste se precisar do caminho do Graphviz no Windows:
 # GRAPHVIZ_BIN_PATH = r"C:\Program Files\Graphviz\bin"
 # os.environ["PATH"] += os.pathsep + GRAPHVIZ_BIN_PATH
 
@@ -37,7 +35,6 @@ class RedBlackTree:
 
     # ---------------- Snapshot / copia ----------------
     def _snapshot(self, descricao: str) -> None:
-        """Guarda descrição da etapa com uma cópia profunda da árvore atual."""
         ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         # copia profunda da árvore, criando novos nós e novo sentinel
         copia_root = self._copy_tree(self.root)
@@ -221,13 +218,13 @@ class RedBlackTree:
             if k.parent == k.parent.parent.right:
                 u = k.parent.parent.left
                 if getattr(u, "color", None) == "red":
-                    # recoloração (caso 1)
+                    #! recoloração (caso 1)
                     u.color = k.parent.color = "black"
                     k.parent.parent.color = "red"
                     self._snapshot(f"recoloracao (caso 1) em avô {k.parent.parent.key}")
                     k = k.parent.parent
                 else:
-                    # rotacoes e recoloracoes (caso 2/3)
+                    #! rotacoes e recoloracoes (caso 2/3)
                     if k == k.parent.left:
                         k = k.parent
                         self.right_rotate(k)
@@ -256,7 +253,7 @@ class RedBlackTree:
             self.root.color = "black"
         self._snapshot("root colorida de preto (final do insert_fix)")
 
-    # ---------------- Search ----------------
+    #* ---------------- Search ----------------
     def search(self, key):
         node = self.root
         while node != self.NIL and getattr(node, "key", None) is not None:
@@ -268,7 +265,6 @@ class RedBlackTree:
 if __name__ == "__main__":
     rb = RedBlackTree()
 
-    # sequência com 21+ nós que provoca vários casos (ajuste conforme desejar)
     valores = [30, 15, 10, 40, 20, 35, 50, 5, 12, 18, 25, 32, 37, 45, 55, 3, 8, 11, 14, 17, 19]
 
     print(f"Inserindo {len(valores)} nós: {valores}")
