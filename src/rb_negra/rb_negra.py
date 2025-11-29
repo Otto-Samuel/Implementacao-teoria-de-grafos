@@ -43,9 +43,6 @@ class RedBlackTree:
         self._step_counter += 1
 
     def _copy_tree(self, node, parent=None):
-        """Copia recursivamente a árvore atual. Retorna referência à nova raiz.
-           Se node for o sentinel original (self.NIL), cria um novo NIL local.
-        """
         if node is None:
             return None
         # detect sentinel by key None
@@ -66,7 +63,6 @@ class RedBlackTree:
 
     # ---------------- Export ----------------
     def export_steps(self, out_dir: str = "arvore_steps", png: bool = True, gif: bool = False, gif_name: str = "arvore_evolucao.gif", open_after: bool = False) -> None:
-        """Exporta todos os snapshots registrados como PNG e opcionalmente converte para GIF."""
         os.makedirs(out_dir, exist_ok=True)
         png_files = []
         for step in self._steps:
@@ -116,7 +112,6 @@ class RedBlackTree:
         def add_nodes(n):
             if n is None:
                 return
-            # assume sentinel tem key is None
             if getattr(n, "key", None) is None:
                 return
             fillcolor = "#e74c3c" if n.color == "red" else "#2c3e50"
@@ -137,7 +132,6 @@ class RedBlackTree:
         out_path_base, _ = os.path.splitext(out_path)
         dot.render(out_path_base, format='png', cleanup=True)
 
-    # ---------------- Rotations (com snapshot) ----------------
     def left_rotate(self, x):
         y = x.right
         x.right = y.left
