@@ -33,7 +33,6 @@ class RedBlackTree:
         # snapshot do estado inicial (árvore vazia)
         self._snapshot("inicial (vazia)")
 
-    # ---------------- Snapshot / copia ----------------
     def _snapshot(self, descricao: str) -> None:
         ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         # copia profunda da árvore, criando novos nós e novo sentinel
@@ -45,7 +44,6 @@ class RedBlackTree:
     def _copy_tree(self, node, parent=None):
         if node is None:
             return None
-        # detect sentinel by key None
         if node == self.NIL or node.key is None:
             nil_new = Node(None)
             nil_new.color = "black"
@@ -100,11 +98,9 @@ class RedBlackTree:
         return (ok[:60]).strip("_")
 
     def _node_id(self, node):
-        # unique id for Graphviz nodes in this snapshot copy
         return f"n{str(id(node))}"
 
     def _render_png(self, root_node, out_path: str, title: Optional[str] = None) -> None:
-        """Renderiza uma cópia da árvore (root_node) para PNG. Não mostra NIL placeholders."""
         dot = Digraph(comment=title or "RubroNegra")
         dot.attr(rankdir='TB')
         dot.attr('node', shape='circle', style='filled', fontsize='12', fontname='Arial')
