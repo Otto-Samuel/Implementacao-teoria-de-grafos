@@ -60,7 +60,7 @@ class RedBlackTree:
         return new_node
 
     # ---------------- Export ----------------
-    def export_steps(self, out_dir: str = "arvore_steps", png: bool = True, gif: bool = False, gif_name: str = "arvore_evolucao.gif", open_after: bool = False) -> None:
+    def export_steps(self, out_dir: str = "steps-rb_negra", png: bool = True, gif: bool = False, gif_name: str = "arvore_evolucao.gif", open_after: bool = False) -> None:
         os.makedirs(out_dir, exist_ok=True)
         png_files = []
         for step in self._steps:
@@ -71,7 +71,7 @@ class RedBlackTree:
             png_path = os.path.join(out_dir, filename_base + ".png")
             self._render_png(root_copy, png_path, title=f"{idx:03d} - {desc}")
             png_files.append(png_path)
-
+        # 
         if gif:
             frames = []
             for p in png_files:
@@ -262,5 +262,5 @@ if __name__ == "__main__":
         rb.insert(v)
         print(f"  -> inserido {v}")
 
-    rb.export_steps(out_dir="arvore_steps", png=True, gif=False, gif_name="construcao_rbt.gif", open_after=False)
+    rb.export_steps(out_dir="steps-rb_negra", png=True, gif=False, gif_name="construcao_rbt.gif", open_after=False)
     print("Export concluído.")

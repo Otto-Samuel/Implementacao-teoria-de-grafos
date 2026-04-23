@@ -112,7 +112,8 @@ def plot_tree234(tree, passo):
 
     add_node(tree.root)
 
-    nome = f"passo_{passo:02d}"
+    os.makedirs("steps", exist_ok=True)
+    nome = os.path.join("steps", f"passo_{passo:02d}")
     dot.render(nome, format="png", cleanup=True)
     print(f"Gerado: {nome}.png")
 
