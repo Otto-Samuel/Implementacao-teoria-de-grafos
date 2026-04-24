@@ -1,12 +1,10 @@
 import os
+os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
 import copy
 from graphviz import Digraph
 import imageio
 from datetime import datetime
 from typing import Optional
-
-# GRAPHVIZ_BIN_PATH = r"C:\Program Files\Graphviz\bin"
-# os.environ["PATH"] += os.pathsep + GRAPHVIZ_BIN_PATH
 
 class Node:
     def __init__(self, key):
