@@ -1,0 +1,6 @@
+// Árvore 2-3-4 — Passo 1
+digraph {
+	dpi=250 rankdir=TB
+	node [fillcolor="#2e7d32" fontcolor=white fontname="Arial Bold" fontsize=20 penwidth=3 shape=box style="filled,rounded"]
+	1915824673120 [label=50]
+}

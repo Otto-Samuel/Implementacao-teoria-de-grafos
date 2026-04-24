@@ -1,7 +1,6 @@
 import os
-from graphviz import Digraph
-
 os.environ["PATH"] += os.pathsep + r"C:\Program Files\Graphviz\bin"
+from graphviz import Digraph
 
 # ============================= ÁRVORE 2-3-4 =============================
 
@@ -112,8 +111,8 @@ def plot_tree234(tree, passo):
 
     add_node(tree.root)
 
-    os.makedirs("steps", exist_ok=True)
-    nome = os.path.join("steps", f"passo_{passo:02d}")
+    os.makedirs("steps-tree_2-3-4", exist_ok=True)
+    nome = os.path.join("steps-tree_2-3-4", f"passo_{passo:02d}")
     dot.render(nome, format="png", cleanup=True)
     print(f"Gerado: {nome}.png")
 
