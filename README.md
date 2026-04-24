@@ -23,12 +23,17 @@ Abaixo estão as representações visuais das árvores geradas durante a execuç
 ### 1. Árvore Rubro-Negra (Red-Black Tree)
 A Árvore Rubro-Negra garante que o caminho mais longo da raiz até uma folha não seja mais do que o dobro do caminho mais curto.
 
-![Visualização da Árvore Rubro-Negra](./caminho/para/sua/imagem-rubro-negra.png)
+<p align="center">
+  <img width=600 src="https://github.com/Otto-Samuel/Implementacao-teoria-de-grafos/blob/main/steps-rb_negra/step_071_insercao__19__-_finalizada.png?raw=true"/>
+  
+</p>
 
 ### 2. Árvore 2-3-4
 Representação de nós que podem conter até 3 chaves e 4 filhos, demonstrando o equilíbrio perfeito entre as folhas.
 
-![Visualização da Árvore 2-3-4](./caminho/para/sua/imagem-tree-234.png)
+<p align="center">
+  <img height=200 width=auto src="https://github.com/Otto-Samuel/Implementacao-teoria-de-grafos/blob/main/steps-tree_2-3-4/passo_30.png?raw=true"/>
+</p>
 
 ---
 
